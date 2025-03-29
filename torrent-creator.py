@@ -179,7 +179,7 @@ def create_torrent(path, announce_url, torrent_output_path, piece_size, print_ma
     torrent = {
         'announce': announce_url,
         'info': info_dict,
-        'created by': 'Beluga Torrent Creator',
+        'created by': 'Torrent-Creator/1.1',
         'creation date': int(time.time())
     }
     torrent_bencoded = bencode.encode(torrent)
@@ -203,7 +203,7 @@ def list_files():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    parser = argparse.ArgumentParser(description='Beluga Torrent Creator')
+    parser = argparse.ArgumentParser(description='Torrent-Creator/1.1')
     parser.add_argument('-p', action='store_true')
     parser.add_argument('-a', '--announce')
     parser.add_argument('-o', '--output')
