@@ -28,7 +28,7 @@ pip install torrent-creator
 ```
 git clone https://github.com/yourusername/torrent-creator.git
 cd torrent-creator
-python setup.py install
+python torrent-creator.py
 ```
 
 ## Setup / Configuration
