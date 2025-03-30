@@ -50,15 +50,14 @@ Upon the first run, ``torrent-creator`` will prompt you to configure the followi
 ## Usage
 
 
-```    usage: torrent-creator.py [-h] [-p] [-a ANNOUNCE] [-o OUTPUT] [--ps PS]
+```    usage: torrent-creator [-h] [-p] [-a ANNOUNCE] [-o OUTPUT] [--ps PS]
                            [--platform PLATFORM] [--magnet] [--reset-env]
                            [-set] [-t] [-l] [--tracker-type {1,2}]
                            [-current-conf] [filename]
 
-Torrent-Creator/1.1
 
 positional arguments:
-  filename              The file or directory to create a torrent from.
+  <filename>/directory              The file or directory to create a torrent from.
 
 optional arguments:
   -h, --help            Show this help message and exit.
