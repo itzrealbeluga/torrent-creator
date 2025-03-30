@@ -1,0 +1,10 @@
+torrent-creator version 1.1.9
+- Added progress bar
+- Better CLI interface and documentation
+- Enhanced argument validation
+- Support for multiple trackers
+- Improved environment file handling
+- Interactive configuration setup
+- Logging improvements
+- Help command for detailed usage
+- Bug Fix
