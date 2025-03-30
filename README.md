@@ -83,7 +83,7 @@ optional arguments:
 ## Changes
 
 **Torrent-Creator Version 1.1.9**
-''
+
 - Added progress bar
 - Better CLI interface and documentation
 - Enhanced argument validation
@@ -93,4 +93,3 @@ optional arguments:
 - Logging improvements
 - Help command for detailed usage
 - Bug Fix
-''
