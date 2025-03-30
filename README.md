@@ -1,4 +1,4 @@
-# Torrent Creator Version 1.1.7
+# Torrent Creator Version 1.2.0
 
 Torrent Creator is a Python-based CLI tool that allows users to easily create torrent files. It supports both single-file and multi-file torrents, customizable torrent piece sizes, and platform detection (Windows/Linux). This tool also generates magnet URIs based on user preferences and allows users to customize the tracker type for private or public trackers.
 
