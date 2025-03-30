@@ -140,7 +140,7 @@ def print_help():
     - torrent-creator.py <file_or_folder> : Create a torrent using .env or overrides.
 
 Example:
-    python torrent-creator.py --output "/path/to/output" --announce "http://tracker.example.com/announce" --ps 1048576 /path/to/video
+    python torrent-creator.py --output "/path/to/output" --announce "http://tracker.example.com/announce" --ps 1048576 </path/to/video>/<Directory/Folder>
     """)
 
 def generate_magnet(info_dict, announce_url):
@@ -223,7 +223,7 @@ def create_torrent(path, announce_url, torrent_output_path, piece_size, print_ma
     torrent = {
         'announce': announce_url,
         'info': info_dict,
-        'created by': 'Torrent-Creator/1.1',
+        'created by': 'Torrent-Creator/1.2',
         'creation date': int(time.time())
     }
     torrent_bencoded = bencode.encode(torrent)
@@ -249,12 +249,58 @@ def show_current_conf():
     for key in ["TORRENT_OUTPUT_PATH", "ANNOUNCE_URL", "PRINT_MAGNET_URL", "PLATFORM", "PIECE_SIZE", "TRACKER_TYPE"]:
         value = os.getenv(key)
         logging.info(f"{key}: {value}")
+def load_and_parse_env():
+    env_values = {}
+    if ENV_FILE.exists():
+        with open(ENV_FILE, 'r') as env_file:
+            lines = env_file.readlines()
+            for line in lines:
+                line = line.strip()
+                if line and '=' in line:
+                    key, value = line.split('=', 1)
+                    env_values[key.strip()] = value.strip()
+    return env_values
+
+
+def reset_env_file():
+    logging.info("Reconfiguring the .env file...")
+    existing_env = load_and_parse_env()
+    torrent_keys = ["TORRENT_OUTPUT_PATH", "ANNOUNCE_URL", "PRINT_MAGNET_URL", "PLATFORM", "PIECE_SIZE", "TRACKER_TYPE"]
+    
+    for key in torrent_keys:
+        if key == "TORRENT_OUTPUT_PATH":
+            val = input("Enter path to save .torrent files: ").strip()
+        elif key == "ANNOUNCE_URL":
+            val = input("Enter announce URL: ").strip()
+        elif key == "PRINT_MAGNET_URL":
+            val = input("Print magnet URI after creation? (true/false): ").strip().lower()
+        elif key == "PLATFORM":
+            val = input("Select platform [1=Windows, 2=Linux]: ").strip()
+        elif key == "PIECE_SIZE":
+            print("Select torrent piece size:")
+            for k, size in PIECE_SIZES.items():
+                print(f"{k}. {size // 1024} KB")
+            choice = input("Enter choice [1-7]: ").strip()
+            val = str(PIECE_SIZES.get(choice, 2**20))
+        elif key == "TRACKER_TYPE":
+            val = input("Enter tracker type [1=Public, 2=Private]: ").strip()
+
+        existing_env[key] = val
+
+    with open(ENV_FILE, 'w') as env_file:
+        for key, value in existing_env.items():
+            env_file.write(f"{key}={value}\n")
+
+    load_dotenv(dotenv_path=ENV_FILE, override=True)
+    logging.info("Reconfigured .env file with new torrent creation settings.")
+
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(
-        description='Torrent-Creator/1.1 - A tool to create torrents from files and directories.',
+        description='Torrent-Creator/1.2 - A CLI tool to create torrents from files and directories.',
         formatter_class=argparse.RawTextHelpFormatter
     )
 
@@ -275,10 +321,7 @@ def main():
     args = parser.parse_args()
 
     if args.reset_env:
-        prompt_env_setup()
-        load_dotenv(dotenv_path=ENV_FILE, override=True)
-        validate_env()
-        logging.info("Reconfigured .env file.")
+        reset_env_file()
         sys.exit(0)
 
     if args.set:

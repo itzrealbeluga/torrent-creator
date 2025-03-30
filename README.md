@@ -80,16 +80,17 @@ optional arguments:
 
 
 
-## Changes
+## Last Changes
 
-**Torrent-Creator Version 1.1.9**
-
-- Added progress bar
-- Better CLI interface and documentation
-- Enhanced argument validation
-- Support for multiple trackers
-- Improved environment file handling
-- Interactive configuration setup
-- Logging improvements
-- Help command for detailed usage
-- Bug Fix
+**Torrent-Creator Version 1.2.0**
+- Added progress bar for real-time file and piece processing
+- Improved CLI interface with detailed help and usage examples
+- Added better error handling and argument validation
+- Replaced `.env` management for platform-specific configurations (Windows/Linux)
+- Introduced new option to interactively configure environment variables
+- Support for multiple tracker URLs in torrent creation
+- Enhanced logging functionality for better debugging and user feedback
+- Added functionality to show current configuration via `-current-conf`
+- Ability to override torrent piece size and output directory via command line
+- Fixed env conflict
+- other bugs fixed
