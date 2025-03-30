@@ -1,30 +1,25 @@
-# Torrent Creator
+# Torrent Creator Version 1.1.7
 
-Torrent Creator is a Python CLI tool that allows users to create torrent files easily. It supports both single-file and multi-file torrents, platform detection (Windows/Linux), piece size selection, and more. It also generates magnet URIs based on user preferences.
+Torrent Creator is a Python-based CLI tool that allows users to easily create torrent files. It supports both single-file and multi-file torrents, customizable torrent piece sizes, and platform detection (Windows/Linux). This tool also generates magnet URIs based on user preferences and allows users to customize the tracker type for private or public trackers.
 
 ## Features
 
-- **Create single-file or multi-file torrents**: Supports generating torrents from directories and individual files.
-- **Platform Detection**: Automatically detects whether the script is running on Windows or Linux and stores configuration (`.env`) in the appropriate location.
-  - **Windows**: `.env` file created in `C:/torrent-creator/.env`
-  - **Linux**: `.env` file created in `/home/<username>/.env`
-- **Configurable Piece Size**: Supports customizable piece size from 256 KB to 16 MB.
-- **Magnet URI Generation**: Optionally prints a magnet URI after the torrent is created.
-- **Override Configuration via CLI**: Allows overriding `.env` values like output path, announce URL, piece size, and more via command-line arguments.
-- **Interactive Setup**: On the first run, the script will prompt the user for necessary configurations and store them in the `.env` file.
-- **Reset Configuration**: Reset the `.env` file and reconfigure all options using `--reset-env`.
+- **Create Single-File or Multi-File Torrents**: Supports creating torrents from individual files or entire directories.
+- **Platform Detection**: Automatically detects the operating system (Windows or Linux) and saves configuration (`.env`) in the appropriate location.
+  - **Windows**: `.env` is saved in `C:/torrent-creator/.env`
+  - **Linux**: `.env` is saved in `/home/<username>/torrent-creator/.env`
+- **Customizable Piece Size**: Allows selecting a piece size from 256 KB to 16 MB.
+- **Magnet URI Generation**: Optionally generates and displays a magnet URI after the torrent is created.
+- **Override Configuration via CLI**: Allows overriding the default `.env` values (such as output path, announce URL, piece size, etc.) directly from the command line.
+- **Private or Public Tracker Types**: Customizable tracker type with an option to enable/disable DHT, PeX, and LSD based on the tracker type.
+- **Reconfigure `.env` File**: Supports resetting and reconfiguring the `.env` file with the `--reset-env` option.
+- **Debugging**: A `-current-conf` command to print the current configuration.
 
 ## Installation
 
-### Requirements
+To install the tool, run the following command:
 
-- Python 3.x
-- `bencodepy`: For creating torrent files.
-- `python-dotenv`: For reading and writing the `.env` configuration file.
-
-To install the required dependencies, run:
-
-```bash
-pip install bencodepy python-dotenv
-
+```
+pip install torrent-creator
+```
 

@@ -22,9 +22,13 @@ PIECE_SIZES = {
 
 def get_env_file_path():
     if sys.platform.startswith("win"):
-        return Path("C:/torrent-creator/.env")
+        env_dir = Path("C:/torrent-creator")
+        env_dir.mkdir(parents=True, exist_ok=True)
+        return env_dir / '.env'
     elif sys.platform.startswith("linux"):
-        return Path(f"/home/{getpass.getuser()}/.env")
+        env_dir = Path(f"/home/{getpass.getuser()}/torrent-creator")
+        env_dir.mkdir(parents=True, exist_ok=True)
+        return env_dir / '.env'
     return None
 
 ENV_FILE = get_env_file_path()
@@ -36,6 +40,7 @@ def validate_env():
         "PRINT_MAGNET_URL": lambda x: x.lower() in ("true", "false"),
         "PLATFORM": lambda x: x in ("1", "2"),
         "PIECE_SIZE": lambda x: x.isdigit() and int(x) in PIECE_SIZES.values(),
+        "TRACKER_TYPE": lambda x: x in ("1", "2")  # 1 for public, 2 for private
     }
     updated = False
     for key, check in required_keys.items():
@@ -55,6 +60,8 @@ def validate_env():
                     print(f"{k}. {size // 1024} KB")
                 choice = input("Enter choice [1-7]: ").strip()
                 val = str(PIECE_SIZES.get(choice, 2**20))
+            elif key == "TRACKER_TYPE":
+                val = input("Enter tracker type [1=Public, 2=Private]: ").strip()
             set_key(str(ENV_FILE), key, val)
             updated = True
     if updated:
@@ -65,16 +72,29 @@ def prompt_env_setup():
     announce_url = input("Enter the announce URL for the torrent tracker: ").strip()
     print_magnet = input("Print magnet URI after creation? (true/false): ").strip().lower()
     platform = input("Select platform [1=Windows, 2=Linux]: ").strip()
+
+    print("\nPublic Tracker vs Private Tracker:")
+    print("1. Public Tracker:")
+    print("   - DHT, PeX, and LSD are enabled.")
+    print("   - Anyone can join and download torrents.")
+    print("2. Private Tracker:")
+    print("   - DHT, PeX, and LSD are disabled.")
+    print("   - Access is restricted to invited users.")
+    
+    tracker_type = input("Enter tracker type [1=Public, 2=Private]: ").strip()
+    
     print("Select torrent piece size:")
     for key, size in PIECE_SIZES.items():
         print(f"{key}. {size // 1024} KB")
     piece_size_choice = input("Enter choice [1-7]: ").strip()
     piece_size = PIECE_SIZES.get(piece_size_choice, 2**20)
+    
     with open(ENV_FILE, "w") as f:
         f.write(f"TORRENT_OUTPUT_PATH={output_path or './torrents'}\n")
         f.write(f"ANNOUNCE_URL={announce_url or 'http://tracker.opentrackr.org:1337/announce'}\n")
         f.write(f"PRINT_MAGNET_URL={print_magnet or 'false'}\n")
         f.write(f"PLATFORM={platform or '2'}\n")
+        f.write(f"TRACKER_TYPE={tracker_type or '2'}\n")
         f.write(f"PIECE_SIZE={piece_size}\n")
 
 if not ENV_FILE.exists():
@@ -116,7 +136,7 @@ def print_help():
     - torrent-creator.py -a [url] : Override announce URL.
     - torrent-creator.py --ps [size] : Override piece size (bytes).
     - torrent-creator.py --reset-env : Reconfigure the .env file.
-    - torrent-creator.py -set [-p | -a | --ps | --platform | --magnet]
+    - torrent-creator.py -set [-p | -a | --ps | --platform | --magnet | --tracker-type]
     - torrent-creator.py <file_or_folder> : Create a torrent using .env or overrides.
     """)
 
@@ -136,6 +156,7 @@ def create_torrent(path, announce_url, torrent_output_path, piece_size, print_ma
                 full_path = os.path.join(root, name)
                 relative_path = os.path.relpath(full_path, start=path)
                 file_entries.append((full_path, relative_path.replace("\\", "/").split("/")))
+
     if os.path.isdir(path):
         collect_files(path)
         buffer = b''
@@ -176,6 +197,15 @@ def create_torrent(path, announce_url, torrent_output_path, piece_size, print_ma
             'length': file_size,
             'private': 1,
         }
+
+    tracker_type = os.getenv("TRACKER_TYPE", "2")
+    if tracker_type == "1":  # Public tracker
+        info_dict['private'] = 0
+        logging.info("Public tracker detected. DHT, PeX, and LSD are enabled.")
+    else:  # Private tracker
+        info_dict['private'] = 1
+        logging.info("Private tracker detected. DHT, PeX, and LSD are disabled.")
+
     torrent = {
         'announce': announce_url,
         'info': info_dict,
@@ -200,7 +230,13 @@ def list_files():
         logging.info(f"- {file}")
     sys.exit(0)
 
-if __name__ == "__main__":
+def show_current_conf():
+    logging.info("Current Configuration (.env):")
+    for key in ["TORRENT_OUTPUT_PATH", "ANNOUNCE_URL", "PRINT_MAGNET_URL", "PLATFORM", "PIECE_SIZE", "TRACKER_TYPE"]:
+        value = os.getenv(key)
+        logging.info(f"{key}: {value}")
+
+def main():
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(description='Torrent-Creator/1.1')
@@ -214,6 +250,8 @@ if __name__ == "__main__":
     parser.add_argument('-set', action='store_true')
     parser.add_argument('-t', '--trackers', action='store_true')
     parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('--tracker-type', choices=["1", "2"], help="Set tracker type: 1=Public, 2=Private")
+    parser.add_argument('-current-conf', action='store_true', help="Show current configuration from .env")
     parser.add_argument('filename', nargs='?')
 
     args = parser.parse_args()
@@ -236,8 +274,10 @@ if __name__ == "__main__":
             update_env_var("PLATFORM", str(args.platform))
         elif args.magnet:
             update_env_var("PRINT_MAGNET_URL", args.magnet.lower())
+        elif args.tracker_type:
+            update_env_var("TRACKER_TYPE", args.tracker_type)
         else:
-            print("Choose what to set:\n1. Output Path\n2. Announce URL\n3. Piece Size\n4. Platform\n5. Magnet Output")
+            print("Choose what to set:\n1. Output Path\n2. Announce URL\n3. Piece Size\n4. Platform\n5. Magnet Output\n6. Tracker Type")
             choice = input("Enter choice number: ").strip()
             if choice == '1':
                 val = input("Enter new output path: ").strip()
@@ -257,6 +297,13 @@ if __name__ == "__main__":
             elif choice == '5':
                 val = input("Print magnet URI? (true/false): ").strip()
                 update_env_var("PRINT_MAGNET_URL", val.lower())
+            elif choice == '6':
+                val = input("Enter tracker type [1=Public, 2=Private]: ").strip()
+                update_env_var("TRACKER_TYPE", val)
+        sys.exit(0)
+
+    if args.current_conf:
+        show_current_conf()
         sys.exit(0)
 
     if not sys.argv[1:]:
@@ -309,3 +356,6 @@ if __name__ == "__main__":
 
     logging.error('Invalid arguments. Use -h for help.')
     sys.exit(1)
+
+if __name__ == "__main__":
+    main()
