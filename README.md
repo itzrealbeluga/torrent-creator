@@ -77,3 +77,20 @@ optional arguments:
   --tracker-type {1,2}  Set tracker type: 1=Public, 2=Private.
 
 ```
+
+
+
+## Changes
+
+**Torrent-Creator Version 1.1.9**
+''
+- Added progress bar
+- Better CLI interface and documentation
+- Enhanced argument validation
+- Support for multiple trackers
+- Improved environment file handling
+- Interactive configuration setup
+- Logging improvements
+- Help command for detailed usage
+- Bug Fix
+''
