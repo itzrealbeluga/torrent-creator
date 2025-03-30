@@ -9,11 +9,11 @@ Torrent Creator is a Python-based CLI tool that allows users to easily create to
   - **Windows**: `.env` is saved in `C:/torrent-creator/.env`
   - **Linux**: `.env` is saved in `/home/<username>/torrent-creator/.env`
 - **Customizable Piece Size**: Allows selecting a piece size from 256 KB to 16 MB.
-- **Magnet URI Generation**: Optionally generates and displays a magnet URI after the torrent is created.
+- **Magnet URL Generation**: Optionally generates and displays a magnet URL after the torrent is created.
 - **Override Configuration via CLI**: Allows overriding the default `.env` values (such as output path, announce URL, piece size, etc.) directly from the command line.
 - **Private or Public Tracker Types**: Customizable tracker type with an option to enable/disable DHT, PeX, and LSD based on the tracker type.
 - **Reconfigure `.env` File**: Supports resetting and reconfiguring the `.env` file with the `--reset-env` option.
-- **Debugging**: A `-current-conf` command to print the current configuration.
+
 
 ## Installation
 
@@ -23,3 +23,58 @@ To install the tool, run the following command:
 pip install torrent-creator
 ```
 
+# Alternatively, you can clone the repository and install it locally:
+
+```
+git clone https://github.com/yourusername/torrent-creator.git
+cd torrent-creator
+python setup.py install
+```
+
+## Setup / Configuration
+
+Upon the first run, ``torrent-creator`` will prompt you to configure the following settings:
+
+- **TORRENT_OUTPUT_PATH:** Path where the .torrent files will be saved.
+
+- **ANNOUNCE_URL:** The announce URL for the torrent tracker.
+
+- **PRINT_MAGNET_URL:** Whether to print the magnet URI after creation (true or false).
+
+- **PLATFORM:** The platform (1 for Windows, 2 for Linux).
+
+- **PIECE_SIZE:** The size of each piece in bytes (must be one of the predefined sizes).
+
+- **TRACKER_TYPE:** The type of tracker (1 for public, 2 for private).
+
+## Usage
+
+
+```    usage: torrent-creator.py [-h] [-p] [-a ANNOUNCE] [-o OUTPUT] [--ps PS]
+                           [--platform PLATFORM] [--magnet] [--reset-env]
+                           [-set] [-t] [-l] [--tracker-type {1,2}]
+                           [-current-conf] [filename]
+
+Torrent-Creator/1.1
+
+positional arguments:
+  filename              The file or directory to create a torrent from.
+
+optional arguments:
+  -h, --help            Show this help message and exit.
+  -p                    Show current path for .torrent file output.
+  -a ANNOUNCE, --announce ANNOUNCE
+                        Override announce URL.
+  -o OUTPUT, --output OUTPUT
+                        Override output directory.
+  --ps PS, --piece-size PS
+                        Override piece size (bytes).
+  --platform PLATFORM   Override platform (1=Windows, 2=Linux).
+  --magnet              Print magnet URI after creation.
+  --reset-env           Reconfigure the .env file.
+  -set                  Set environment variables interactively.
+  -t, --trackers        Show trackers from an existing torrent file.
+  -l, --list            List files in the torrent directory.
+  --tracker-type {1,2}  Set tracker type: 1=Public, 2=Private.
+
+```
